@@ -1,8 +1,10 @@
 import streamlit as st
 import joblib
 import numpy as np
+from sklearn.linear_model import LogisticRegression
 
-# Load your trained model
+# Load your trained Logistic Regression model
+# Make sure you retrain your model using LogisticRegression() and save as 'diabetes_model.pkl'
 lr = joblib.load("diabetes_model.pkl")
 
 # App title
@@ -19,15 +21,12 @@ if st.button("Predict", key="btn_predict_v2"):
     # Arrange inputs into an array (match training order)
     input_data = np.array([[glucose, bmi, age]])
     
-    # Make prediction (continuous output)
-    prediction = lr.predict(input_data)[0]
-    
-    # Convert continuous prediction to binary
-    prediction_binary = 1 if prediction >= 0.5 else 0
+    # Make prediction using Logistic Regression
+    prediction = lr.predict(input_data)[0]  # 0 or 1
+    prediction_prob = lr.predict_proba(input_data)[0][1]  # probability of diabetes
 
     # Show result
-    if prediction_binary == 1:
-        st.error("⚠️ The model predicts that the patient **has a risk of diabetes.**")
+    if prediction == 1:
+        st.error(f"⚠️ The model predicts that the patient **has a risk of diabetes.** (Probability: {prediction_prob:.2f})")
     else:
-        st.success("✅ The model predicts that the patient **is not likely to have diabetes.**")
-
+        st.success(f"✅ The model predicts that the patient **is not likely to have diabetes.** (Probability: {prediction_prob:.2f})")
